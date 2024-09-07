@@ -1,36 +1,47 @@
-apiVersion: apps/v1
-kind: Deployment
+# Deployment configuration for the book-catalog application
+apiVersion: apps/v1 # The API version used for the Deployment resource
+kind: Deployment # Specifies this resource is a Deployment
 metadata:
-  name: book-catalog
+  name: book-catalog # Name of the Deployment
+
 spec:
-  replicas: 1
+  replicas: 1 # Specifies the number of pod replicas (1 instance of the application)
   selector:
     matchLabels:
-      app: book-catalog
+      app: book-catalog # Select pods with this label to be managed by the Deployment
   template:
     metadata:
       labels:
-        app: book-catalog
+        app: book-catalog # Label to identify this pod, used by the Service selector
+
     spec:
       containers:
-        - name: book-catalog
-          image: week6:1
+        - name: book-catalog # Name of the container inside the pod
+          image: week6:1 # Docker image to be used by the container (local image)
           ports:
-            - containerPort: 8000
-          imagePullPolicy: Never
+            - containerPort: 8000 # Container will listen on port 8000
+          imagePullPolicy: Never # Prevent Kubernetes from pulling the image from a remote registry
+
+          # Environment variables for the container
           env:
-            - name: DATABASE_URL
+            - name: DATABASE_URL # Name of the environment variable
               value: "postgresql://example_2_user:j58ucCxyvcP03xy9yeBZtLtFQdJxsZSc@dpg-cra7052j1k6c73bsr630-a.oregon-postgres.render.com/example_2"
+              # Database connection URL for PostgreSQL
+
 ---
-apiVersion: v1
-kind: Service
+# Service configuration to expose the book-catalog application
+apiVersion: v1 # The API version used for the Service resource
+kind: Service # Specifies this resource is a Service
 metadata:
-  name: book-catalog
+  name: book-catalog # Name of the Service
+
 spec:
   selector:
-    app: book-catalog
-  type: NodePort
+    app: book-catalog # This service will route traffic to pods with this label
+
+  type: NodePort # Expose the service via a NodePort, making it accessible externally
+
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
+    - protocol: TCP # Communication will be done over the TCP protocol
+      port: 8000 # The service will listen on port 8000
+      targetPort: 8000 # Forward traffic to port 8000 of the pod/container
